@@ -23,6 +23,10 @@ class TestCrypto(unittest.TestCase):
 	def test_calc_address(self):
 		self.assertEqual(calc_address(self.sender_spend.public, self.sender_view.public), "4ANVvHw53F4ZoAdaHjnk3X2RG72XPbMhNcqmh7ceNJ526jWumE5gyCt9Nqhv4Kav23Toq67pN8JLtazJDTuiwt2tUwQfxmP")
 	
+	def test_calc_subaddress(self):
+		self.assertEqual(calc_subaddress(self.sender_view.public, 1), "87G9JyU6SZYbz6A3E6b4GCAVDj52WYhmLKhBjrEwpVPjJDtQXWbhZcfFBVas9oGhT9a6SA98DZmbfAsVWjTbd9wfQUdg6HC")
+		self.assertEqual(calc_subaddress(self.sender_view.public, 2), "8Bar97cVLsQNKsR7GPR9VwCwG4p5CkEmdMcNqHQzhYWUgzo4MPLZQFRGBfqt4ShU5JLedJbpz3BTYW4eia3ee2WYPeGk7uW")
+
 	def test_check_stealth_address(self):
 		# Transaction Public key from extra (R=rG) in blockchain
 		extra = [ 1, 3, 0, 100, 82, 209, 89, 168, 211, 66, 73, 175, 31, 63, 88, 218, 164, 252, 148, 221, 100, 149, 242, 185, 125, 145, 175, 70, 43, 52, 224, 116, 67, 2, 9, 1, 81, 203, 78, 34, 81, 88, 140, 191]
