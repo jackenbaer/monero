@@ -31,6 +31,26 @@ def calc_address(A: bytes, B: bytes):
     return base58.encode((data + checksum).hex())
 
 
+def calc_subaddress(A:bytes, v: bytes, i: int, a: int):
+    """
+    Args:
+        A: bytes; public spend key
+        v: bytes; private view key
+        i: int; subaddress index 
+        a: int; account index
+    """
+    prefix = 42
+ 
+    data = b'SubAddr\x00' + v + a.to_bytes(4, byteorder="little") +  i.to_bytes(4, byteorder="little")
+    HsG = ed25519.publickey(sc_reduce32(keccak_256(data).digest()))
+    
+    Ksi = ed25519.encodepoint(ed25519.edwards(ed25519.decodepoint(HsG), ed25519.decodepoint(A)))
+    Kvi = ed25519.encodepoint(ed25519.scalarmult(ed25519.decodepoint(Ksi), ed25519.decodeint(v)))
+    
+    data = bytearray([prefix]) + Ksi + Kvi
+    checksum = keccak_256(data).digest()[:4]
+    return base58.encode((data + checksum).hex())
+
 
 
 
@@ -187,40 +207,6 @@ def sender_pedersen_commitment(R:bytes , a:bytes, i:int, enc_amount:str):
 
 
 
-
-
-
-
-
-
-# UNFINISHED
-
-
-def calc_subaddress (a: bytes, A: bytes, b: bytes, B: bytes , i: int):
-    """Calculates subaddress from primary keys (See Zero-to-monero 2.0.0 -> 4.3 Subaddresses)
-    
-    Args:
-        A: bytes; pyblic view key
-        a: bytes; private view key
-        B: bytes; public spend key
-        b: bytes; private spend key
-        i: int; index of subaddress
-    
-    Returns:
-        subaddress:
-    """
-
-    ai =  a + bytes([i])
-    Hs = keccak_256(ai).digest() 
-    Hs = sc_reduce32(Hs)
-    HsG = ed25519.publickey(Hs)
-
-
-    Bi = ed25519.encodepoint(ed25519.edwards(ed25519.decodepoint(B), ed25519.decodepoint(HsG)))
-
-    Ai = ed25519.encodepoint(ed25519.scalarmult(ed25519.decodepoint(Bi), ed25519.decodeint(a)))
-
-    return Ai, Bi
 
 
 
