@@ -39,8 +39,8 @@ def calc_subaddress(A:bytes, v: bytes, i: int, a: int):
         i: int; subaddress index 
         a: int; account index
     """
- 
-    data = b'SubAddr\x00' + v + a.to_bytes(4, byteorder="little") +  i.to_bytes(4, byteorder="little")
+
+    data = b'SubAddr\x00' + v + bytes([a]) + bytes([i])
     HsG = ed25519.publickey(sc_reduce32(keccak_256(data).digest()))
     
     Ksi = ed25519.encodepoint(ed25519.edwards(ed25519.decodepoint(HsG), ed25519.decodepoint(A)))
