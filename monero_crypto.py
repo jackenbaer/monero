@@ -25,8 +25,8 @@ def calc_address(A: bytes, B: bytes):
         A: bytes; public view key
         B: bytes; public spend key 
     """
-    prefix = 18 
-    data = bytearray([prefix]) + A + B
+
+    data = bytearray([18]) + A + B
     checksum = keccak_256(data).digest()[:4]
     return base58.encode((data + checksum).hex())
 
@@ -39,7 +39,6 @@ def calc_subaddress(A:bytes, v: bytes, i: int, a: int):
         i: int; subaddress index 
         a: int; account index
     """
-    prefix = 42
  
     data = b'SubAddr\x00' + v + a.to_bytes(4, byteorder="little") +  i.to_bytes(4, byteorder="little")
     HsG = ed25519.publickey(sc_reduce32(keccak_256(data).digest()))
@@ -47,7 +46,7 @@ def calc_subaddress(A:bytes, v: bytes, i: int, a: int):
     Ksi = ed25519.encodepoint(ed25519.edwards(ed25519.decodepoint(HsG), ed25519.decodepoint(A)))
     Kvi = ed25519.encodepoint(ed25519.scalarmult(ed25519.decodepoint(Ksi), ed25519.decodeint(v)))
     
-    data = bytearray([prefix]) + Ksi + Kvi
+    data = bytearray([42]) + Ksi + Kvi
     checksum = keccak_256(data).digest()[:4]
     return base58.encode((data + checksum).hex())
 
