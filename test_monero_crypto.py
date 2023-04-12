@@ -24,8 +24,8 @@ class TestCrypto(unittest.TestCase):
 		self.assertEqual(calc_address(self.sender_spend.public, self.sender_view.public), "4ANVvHw53F4ZoAdaHjnk3X2RG72XPbMhNcqmh7ceNJ526jWumE5gyCt9Nqhv4Kav23Toq67pN8JLtazJDTuiwt2tUwQfxmP")
 	
 	def test_calc_subaddress(self):
-		self.assertEqual(calc_subaddress(self.sender_view.public, 1), "87G9JyU6SZYbz6A3E6b4GCAVDj52WYhmLKhBjrEwpVPjJDtQXWbhZcfFBVas9oGhT9a6SA98DZmbfAsVWjTbd9wfQUdg6HC")
-		self.assertEqual(calc_subaddress(self.sender_view.public, 2), "8Bar97cVLsQNKsR7GPR9VwCwG4p5CkEmdMcNqHQzhYWUgzo4MPLZQFRGBfqt4ShU5JLedJbpz3BTYW4eia3ee2WYPeGk7uW")
+		self.assertEqual(calc_subaddress(self.sender_spend.public, self.sender_view.private, 1, 0), "85Po4U72oRp7A3yx9c7Gwq6CsCPtbyUVAcUsywMJ5Y47WSV32FgfMehPXhkj2euemijLVobX4ox2tLDeGJWngwP5ThEn1mg")	
+		self.assertEqual(calc_subaddress(self.sender_spend.public, self.sender_view.private, 0, 1), "87G9JyU6SZYbz6A3E6b4GCAVDj52WYhmLKhBjrEwpVPjJDtQXWbhZcfFBVas9oGhT9a6SA98DZmbfAsVWjTbd9wfQUdg6HC")
 
 	def test_check_stealth_address(self):
 		# Transaction Public key from extra (R=rG) in blockchain
