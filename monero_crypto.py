@@ -73,17 +73,13 @@ def check_stealth_address(stealth_address: str, R: bytes, a: bytes, B: bytes, i:
 
 
     arG = ed25519.encodepoint(ed25519.scalarmult(ed25519.decodepoint(R), ed25519.decodeint(a)))
-
     arG =  ed25519.encodepoint(ed25519.scalarmult(ed25519.decodepoint(arG),  8 )) # There is a mathematical reason for this...
     arG += bytes([i])
     
-    Hs = keccak_256(arG).digest()
-
-    Hs = sc_reduce32(Hs)
+    Hs = sc_reduce32(keccak_256(arG).digest())
     HsG = ed25519.publickey(Hs)
 
     my_addr =  ed25519.encodepoint(ed25519.edwards(ed25519.decodepoint(HsG), ed25519.decodepoint(B))).hex()
-
     return my_addr == stealth_address
 
 
@@ -104,22 +100,12 @@ def calc_stealth_address(r: bytes, A: bytes , B: bytes, i: int)-> str:
     Returns:
         stealth address; subaddresses are prefixed with '8', addresses are prefixec with '4'
     """
-
-
     rA  = ed25519.encodepoint(ed25519.scalarmult(ed25519.decodepoint(A), ed25519.decodeint(r)))
-
-
     rA =  ed25519.encodepoint(ed25519.scalarmult(ed25519.decodepoint(rA), 8 )) # There is a mathematical reason for this...
     rA += bytes([i])
 
-
-    Hs = keccak_256(rA).digest() # Hs stands for Hash to scalar, interpret result as scalar
-
-
-    Hs = sc_reduce32(Hs)
-
+    Hs = sc_reduce32(keccak_256(rA).digest()) # Hs stands for Hash to scalar, interpret result as scalar
     HsG = ed25519.publickey(Hs)
-
     return ed25519.encodepoint(ed25519.edwards(ed25519.decodepoint(HsG), ed25519.decodepoint(B))).hex()
 
 
@@ -143,25 +129,14 @@ def calc_key_image(a: bytes, b: bytes, R: bytes, i:int) -> bytes:
     aR =  ed25519.encodepoint(ed25519.scalarmult(ed25519.decodepoint(aR),  8 )) # There is a mathematical reason for this...
     aR += bytes([i])
 
-    Hs = keccak_256(aR).digest()
-
-    Hs = sc_reduce32(Hs)
+    Hs = sc_reduce32(keccak_256(aR).digest())
 
     x = int.from_bytes(Hs, byteorder='little') + int.from_bytes(b, byteorder='little')
-
     x = x % ed25519.l
     x = x.to_bytes(32, 'little')    
-    
 
-    # P = xG
-    P = ed25519.publickey(x)
-    print("P = " , P.hex())
-
-    Hp = hashToPointCN(P)
-
-    # I = xHp(P)
-    I = ed25519.encodepoint(ed25519.scalarmult(Hp, ed25519.decodeint(x)))
-    return I
+    Hp = hashToPointCN(ed25519.publickey(x))
+    return ed25519.encodepoint(ed25519.scalarmult(Hp, ed25519.decodeint(x)))
 
 
 
@@ -183,22 +158,15 @@ def sender_pedersen_commitment(R:bytes , a:bytes, i:int, enc_amount:str):
     amount = 8 byte encrypted amount XOR first 8 bytes of keccak("amount" || Hs(8aR||i))
 
     """
-#    H = ed25519.encodepoint(sc_reduce32(keccak_256(ed25519.B)))
-    
     arG = ed25519.encodepoint(ed25519.scalarmult(ed25519.decodepoint(R), ed25519.decodeint(a)))
-
     arG =  ed25519.encodepoint(ed25519.scalarmult(ed25519.decodepoint(arG),  8 )) # There is a mathematical reason for this...
     arG += bytes([i])
 
-    Hs = keccak_256(arG).digest()
-    Hs = sc_reduce32(Hs)
-
+    Hs = sc_reduce32(keccak_256(arG).digest())
     Hs = "amount".encode() + Hs
 
     HsHs = keccak_256(Hs).digest()
-
     to_xor = HsHs.hex()[:16]
-
     dec_amount = bytes(a ^ b for a, b in zip(bytes.fromhex(enc_amount), bytes.fromhex(to_xor)))
     return int.from_bytes(dec_amount , byteorder="little", signed=False)
 
