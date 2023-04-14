@@ -40,13 +40,13 @@ def calc_subaddress(A:bytes, v: bytes, i: int, a: int):
         a: int; account index
     """
 
-    data = b'SubAddr\x00' + v + bytes([a]) + bytes([i])
+    data = b'SubAddr\x00' + v + a.to_bytes(4, byteorder="little") +  i.to_bytes(4, byteorder="little")
     HsG = ed25519.publickey(sc_reduce32(keccak_256(data).digest()))
     
-    Ksi = ed25519.encodepoint(ed25519.edwards(ed25519.decodepoint(HsG), ed25519.decodepoint(A)))
-    Kvi = ed25519.encodepoint(ed25519.scalarmult(ed25519.decodepoint(Ksi), ed25519.decodeint(v)))
+    Si = ed25519.encodepoint(ed25519.edwards(ed25519.decodepoint(HsG), ed25519.decodepoint(A)))
+    Vi = ed25519.encodepoint(ed25519.scalarmult(ed25519.decodepoint(Si), ed25519.decodeint(v)))
     
-    data = bytearray([42]) + Ksi + Kvi
+    data = bytearray([42]) + Si + Vi 
     checksum = keccak_256(data).digest()[:4]
     return base58.encode((data + checksum).hex())
 
